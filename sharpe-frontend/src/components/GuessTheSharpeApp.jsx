@@ -1,7 +1,3 @@
-// GuessTheSharpeApp.jsx — syntax‑clean centred version
-// -----------------------------------------------------------------------------
-// Only layout / styling touches; game logic unchanged.
-// -----------------------------------------------------------------------------
 import React, { useState } from "react";
 import {
     ResponsiveContainer,
@@ -15,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart as HeartSvg, Coins } from "lucide-react";
+import { Heart as HeartSvg, Diamond } from "lucide-react";
 import clsx from "clsx";
 
 // ──────────────────────────────────
@@ -58,13 +54,6 @@ function coinReward(err, g, t) {
     return 0;
 }
 
-const HeartIcon = ({ full }) => (
-    <HeartSvg className={clsx("w-6 h-6", full ? "fill-red-500" : "fill-gray-400")} />
-);
-
-// ──────────────────────────────────
-// Component
-// ──────────────────────────────────
 export default function GuessTheSharpeApp() {
     const [round, setRound] = useState(genRound());
     const [guess, setGuess] = useState("");
@@ -110,30 +99,32 @@ export default function GuessTheSharpeApp() {
     };
 
     return (
-        <div className="relative min-h-screen flex flex-col items-center justify-center items-center justify-center bg-slate-50" style={pixelFont}>
+        <div className="relative min-h-screen flex flex-col items-center justify-center bg-slate-50" style={pixelFont}>
             {/* subtle grid background */}
-            <div className="absolute inset-0 opacity-5 rotate-6 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(45deg,#0001 0 8px,transparent 8px 16px)" }} />
+            <div
+                className="absolute inset-0 opacity-5 rotate-6 pointer-events-none"
+                style={{ backgroundImage: "repeating-linear-gradient(45deg,#0001 0 8px,transparent 8px 16px)" }}
+            />
 
-            <div className="relative z-10 flex flex-col items-center gap-10 p-6 w-full max-w-6xl mx-auto">
+            {/* Shrink-wrap container for perfect centering */}
+            <div className="relative z-10 flex flex-col items-center gap-10 p-6">
                 {/* HUD */}
-                <div className="flex flex-wrap items-center justify-center gap-6">
-                    <div className="flex items-center gap-2">
-                        {[0, 1, 2].map((i) => (
-                            <HeartIcon key={i} full={i < lives} />
+                <div className="flex items-center justify-center space-x-6 flex-nowrap">
+                    <div className="flex items-center space-x-2">
+                        {Array.from({ length: lives }).map((_, i) => (
+                            <HeartSvg key={i} className="w-6 h-6 fill-red-500" />
                         ))}
-                        <span className="text-gray-700">x&nbsp;{lives}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-yellow-500">
-                        <Coins className="w-6 h-6 fill-yellow-500" />
+                    <div className="flex items-center space-x-2">
+                        <Diamond className="w-6 h-6 fill-yellow-500" />
                         <span>{coins}</span>
                     </div>
                 </div>
 
-                <h1 className="text-4xl tracking-wider text-center">SHARPE&nbsp;GUESSER</h1>
+                <h1 className="text-4xl tracking-wider text-center">SHARPE GUESSER</h1>
 
-                {/* Content grid */}
-                <div className="grid md:grid-cols-2 gap-12 items-start">
-                    {/* Chart */}
+                {/* Centered content */}
+                <div className="flex flex-col md:flex-row gap-12 items-center justify-center">
                     <Card className="bg-white border-4 border-gray-900 shadow-lg">
                         <CardContent className="p-4">
                             <ResponsiveContainer width={480} height={340}>
@@ -147,27 +138,34 @@ export default function GuessTheSharpeApp() {
                         </CardContent>
                     </Card>
 
-                    {/* Control panel */}
                     <div className="flex flex-col items-center gap-6">
                         {!gameOver ? (
                             <>
-                                <div className="flex gap-3 items-center">
+                                <div className="flex gap-3 items-stretch">
                                     <Input
                                         value={guess}
                                         onChange={(e) => setGuess(e.target.value)}
-                                        className="w-72 bg-white border-4 border-black text-black text-lg px-2 py-1 text-center focus:outline-none"
+                                        className="h-12 w-72 bg-white border-4 border-black text-black text-lg px-4 text-center focus:outline-none"
                                         placeholder="?"
                                     />
-                                    <Button onClick={handleSubmit} className="border-4 border-black bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 active:translate-y-px">
+                                    <Button
+                                        onClick={handleSubmit}
+                                        className="h-12 border-4 border-black bg-blue-500 text-white text-lg px-4 hover:bg-blue-600 active:translate-y-px"
+                                    >
                                         GUESS
                                     </Button>
                                 </div>
-
                                 {feedback && (
                                     <ul className="text-sm leading-7 text-center">
-                                        <li><span className="text-gray-500">ACTUAL&nbsp;SR</span> {feedback.target.toFixed(2)}</li>
-                                        <li><span className="text-gray-500">GUESSED&nbsp;SR</span> {feedback.guess.toFixed(2)}</li>
-                                        <li><span className="text-gray-500">DIFFERENCE</span> {feedback.err.toFixed(2)}</li>
+                                        <li>
+                                            <span className="text-gray-500">ACTUAL SR</span> {feedback.target.toFixed(2)}
+                                        </li>
+                                        <li>
+                                            <span className="text-gray-500">GUESSED SR</span> {feedback.guess.toFixed(2)}
+                                        </li>
+                                        <li>
+                                            <span className="text-gray-500">DIFFERENCE</span> {feedback.err.toFixed(2)}
+                                        </li>
                                         <li className="mt-2 font-bold">
                                             {feedback.lost ? (
                                                 <span className="text-red-500">Life lost!</span>
@@ -181,7 +179,12 @@ export default function GuessTheSharpeApp() {
                         ) : (
                             <div className="text-center">
                                 <p className="mb-4 text-2xl">GAME OVER</p>
-                                <Button onClick={resetGame} className="border-4 border-black bg-green-600 px-6 py-3 text-white hover:bg-green-700">NEW GAME</Button>
+                                <Button
+                                    onClick={resetGame}
+                                    className="h-12 border-4 border-black bg-green-600 px-6 py-3 text-white hover:bg-green-700"
+                                >
+                                    NEW GAME
+                                </Button>
                             </div>
                         )}
                     </div>
