@@ -48,12 +48,11 @@ function genRound() {
 }
 
 function coinReward(err, g, t) {
-    if (Math.round(g * 100) === Math.round(t * 100)) return 5;
-    if (Math.round(g * 10) === Math.round(t * 10)) return 3;
-    if (err <= 0.3) return 1;
+    if (g.toFixed(2) === t.toFixed(2)) return 5;      // exactly equal to 2 decimals
+    if (err < 0.1) return 3;
+    if (err < 0.3) return 1;
     return 0;
 }
-
 
 export default function GuessTheSharpeApp() {
     // const [maxCoins, setMaxCoins] = useState(() => {
@@ -178,7 +177,9 @@ export default function GuessTheSharpeApp() {
             {/* Shrink-wrap container for perfect centering */}
             <div className="relative z-10 flex flex-col items-center gap-10 p-6">
                 <h1 className="text-4xl tracking-wider text-center">SHARPE GUESSER</h1>
-
+                {/* <div className="text-xs font-mono text-red-600 mb-2">
+                    [DEBUG] Real Sharpe: <b>{round.sharpe.toFixed(6)}</b>
+                </div> */}
                 {/* HUD */}
                 <div className="flex items-center justify-center gap-x-8">
                     <div className="flex items-center space-x-2 min-w-[80px] justify-center">
