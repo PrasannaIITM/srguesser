@@ -56,6 +56,16 @@ function coinReward(err, g, t) {
 
 
 export default function GuessTheSharpeApp() {
+    // const [maxCoins, setMaxCoins] = useState(() => {
+    //     const stored = localStorage.getItem("maxSharpeCoins");
+    //     return stored ? Number(stored) : 0;
+    // });
+
+    const [maxCoins, setMaxCoins] = useState(() => {
+        const stored = localStorage.getItem("maxSharpeCoins");
+        return stored ? Number(stored) : 0;
+    });
+
     const [round, setRound] = useState(genRound());
     const [guess, setGuess] = useState("");
     const [lives, setLives] = useState(3);
@@ -77,6 +87,14 @@ export default function GuessTheSharpeApp() {
         }
     }, [round, gameOver]);
 
+    // After gameOver is set to true, check and update maxCoins
+    useEffect(() => {
+        if (gameOver && coins > maxCoins) {
+            setMaxCoins(coins);
+            localStorage.setItem("maxSharpeCoins", coins.toString());
+        }
+        // eslint-disable-next-line
+    }, [gameOver]);
 
     const handleNext = () => {
         // Only now check if out of lives
@@ -162,7 +180,24 @@ export default function GuessTheSharpeApp() {
                 <h1 className="text-4xl tracking-wider text-center">SHARPE GUESSER</h1>
 
                 {/* HUD */}
-                <div className="flex items-center justify-center space-x-10 flex-nowrap">
+                <div className="flex items-center justify-center gap-x-8">
+                    <div className="flex items-center space-x-2 min-w-[80px] justify-center">
+                        {Array.from({ length: lives }).map((_, i) => (
+                            <HeartSvg key={i} className="w-6 h-6 fill-red-500" />
+                        ))}
+                    </div>
+                    <div className="flex items-center space-x-2 min-w-[80px] justify-center">
+                        <Diamond className="w-6 h-6 fill-yellow-500" />
+                        <span>{coins}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 min-w-[100px] justify-center">
+                        <span className="font-bold text-slate-700">MAX</span>
+                        <Diamond className="w-5 h-5 fill-yellow-500" />
+                        <span className="text-lg">{maxCoins}</span>
+                    </div>
+                </div>
+
+                {/* <div className="flex items-center justify-center space-x-10 flex-nowrap">
                     <div className="flex items-center space-x-2 mr-4">
                         {Array.from({ length: lives }).map((_, i) => (
                             <HeartSvg key={i} className="w-6 h-6 fill-red-500" />
@@ -172,7 +207,7 @@ export default function GuessTheSharpeApp() {
                         <Diamond className="w-6 h-6 fill-yellow-500" />
                         <span>{coins}</span>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Centered content */}
                 <div className="flex flex-col md:flex-row gap-12 items-center justify-center">
