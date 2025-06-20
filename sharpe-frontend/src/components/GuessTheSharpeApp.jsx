@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react"; // <- Add useRef, useEffect
 import {
     ResponsiveContainer,
     LineChart,
@@ -54,6 +54,7 @@ function coinReward(err, g, t) {
     return 0;
 }
 
+
 export default function GuessTheSharpeApp() {
     const [round, setRound] = useState(genRound());
     const [guess, setGuess] = useState("");
@@ -66,6 +67,28 @@ export default function GuessTheSharpeApp() {
         fontFamily: '"Press Start 2P", monospace',
         letterSpacing: "-0.03em",
     };
+
+    const inputRef = useRef(null);
+
+    // Focus the input every new round/game
+    useEffect(() => {
+        if (!gameOver && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [round, gameOver]);
+
+
+    const handleNext = () => {
+        // Only now check if out of lives
+        if (lives <= 0) {
+            setGameOver(true);
+        } else {
+            setRound(genRound());
+            setGuess("");
+            setFeedback(null);
+        }
+    };
+
 
     const resetGame = () => {
         setRound(genRound());
@@ -86,21 +109,49 @@ export default function GuessTheSharpeApp() {
         if (lost) setLives((l) => l - 1);
         setFeedback({ guess: g, target: round.sharpe, err, pts, lost });
 
-        const remaining = lost ? lives - 1 : lives;
-        setTimeout(() => {
-            if (remaining <= 0) {
-                setGameOver(true);
-            } else {
-                setRound(genRound());
-                setGuess("");
-                setFeedback(null);
-            }
-        }, 1200);
+        // const remaining = lost ? lives - 1 : lives;
+        // setTimeout(() => {
+        //     if (remaining <= 0) {
+        //         setGameOver(true);
+        //     } else {
+        //         setRound(genRound());
+        //         setGuess("");
+        //         setFeedback(null);
+        //     }
+        // }, 1200);
+
     };
+
+    const remainingLives = feedback
+        ? (feedback.lost ? lives - 1 : lives)
+        : lives;
+
+    // useEffect(() => {
+    //     if (!gameOver) return;
+
+    //     const handler = (e) => {
+    //         if (e.key === "Enter") {
+    //             resetGame();
+    //         }
+    //     };
+    //     window.addEventListener("keydown", handler);
+    //     return () => window.removeEventListener("keydown", handler);
+    // }, [gameOver]);
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center bg-slate-50" style={pixelFont}>
             {/* subtle grid background */}
+            {/* <Input
+                ref={inputRef}
+                value={guess}
+                onChange={(e) => setGuess(e.target.value)}
+                onKeyDown={e => {
+                    if (e.key === "Enter") handleSubmit();
+                }}
+                className="h-12 w-72 bg-white border-4 border-black text-black text-lg px-4 text-center focus:outline-none"
+                placeholder="?"
+            /> */}
+
             <div
                 className="absolute inset-0 opacity-5 rotate-6 pointer-events-none"
                 style={{ backgroundImage: "repeating-linear-gradient(45deg,#0001 0 8px,transparent 8px 16px)" }}
@@ -108,9 +159,11 @@ export default function GuessTheSharpeApp() {
 
             {/* Shrink-wrap container for perfect centering */}
             <div className="relative z-10 flex flex-col items-center gap-10 p-6">
+                <h1 className="text-4xl tracking-wider text-center">SHARPE GUESSER</h1>
+
                 {/* HUD */}
-                <div className="flex items-center justify-center space-x-6 flex-nowrap">
-                    <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-10 flex-nowrap">
+                    <div className="flex items-center space-x-2 mr-4">
                         {Array.from({ length: lives }).map((_, i) => (
                             <HeartSvg key={i} className="w-6 h-6 fill-red-500" />
                         ))}
@@ -120,8 +173,6 @@ export default function GuessTheSharpeApp() {
                         <span>{coins}</span>
                     </div>
                 </div>
-
-                <h1 className="text-4xl tracking-wider text-center">SHARPE GUESSER</h1>
 
                 {/* Centered content */}
                 <div className="flex flex-col md:flex-row gap-12 items-center justify-center">
@@ -143,37 +194,55 @@ export default function GuessTheSharpeApp() {
                             <>
                                 <div className="flex gap-3 items-stretch">
                                     <Input
+                                        ref={inputRef}
                                         value={guess}
-                                        onChange={(e) => setGuess(e.target.value)}
+                                        onChange={e => setGuess(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === "Enter") {
+                                                if (!feedback) handleSubmit();
+                                                else handleNext();
+                                            }
+                                        }}
+                                        readOnly={!!feedback}  // not disabled!
                                         className="h-12 w-72 bg-white border-4 border-black text-black text-lg px-4 text-center focus:outline-none"
                                         placeholder="?"
                                     />
+
                                     <Button
                                         onClick={handleSubmit}
                                         className="h-12 border-4 border-black bg-blue-500 text-white text-lg px-4 hover:bg-blue-600 active:translate-y-px"
+                                        disabled={!!feedback}
                                     >
                                         GUESS
                                     </Button>
                                 </div>
                                 {feedback && (
-                                    <ul className="text-sm leading-7 text-center">
-                                        <li>
-                                            <span className="text-gray-500">ACTUAL SR</span> {feedback.target.toFixed(2)}
-                                        </li>
-                                        <li>
-                                            <span className="text-gray-500">GUESSED SR</span> {feedback.guess.toFixed(2)}
-                                        </li>
-                                        <li>
-                                            <span className="text-gray-500">DIFFERENCE</span> {feedback.err.toFixed(2)}
-                                        </li>
-                                        <li className="mt-2 font-bold">
-                                            {feedback.lost ? (
-                                                <span className="text-red-500">Life lost!</span>
-                                            ) : feedback.pts ? (
-                                                <span className="text-yellow-500">+{feedback.pts} coins</span>
-                                            ) : null}
-                                        </li>
-                                    </ul>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <ul className="text-sm leading-7 text-center">
+                                            <li>
+                                                <span className="text-gray-500">ACTUAL SR</span> {feedback.target.toFixed(2)}
+                                            </li>
+                                            <li>
+                                                <span className="text-gray-500">GUESSED SR</span> {feedback.guess.toFixed(2)}
+                                            </li>
+                                            <li>
+                                                <span className="text-gray-500">DIFFERENCE</span> {feedback.err.toFixed(2)}
+                                            </li>
+                                            <li className="mt-2 font-bold">
+                                                {feedback.lost ? (
+                                                    <span className="text-red-500">Life lost!</span>
+                                                ) : feedback.pts ? (
+                                                    <span className="text-yellow-500">+{feedback.pts} coins</span>
+                                                ) : null}
+                                            </li>
+                                        </ul>
+                                        <Button
+                                            className="h-10 mt-2 border-2 border-black bg-slate-800 text-white hover:bg-slate-900"
+                                            onClick={handleNext}
+                                        >
+                                            NEXT
+                                        </Button>
+                                    </div>
                                 )}
                             </>
                         ) : (
