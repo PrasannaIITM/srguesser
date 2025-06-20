@@ -289,6 +289,22 @@ export default function GuessTheSharpeApp() {
                                 >
                                     NEW GAME
                                 </Button>
+                                <Button
+                                    onClick={() => {
+                                        const tweet = encodeURIComponent(
+                                            `I just scored a max Sharpe Guesser high score of ${maxCoins}! 📈🪙
+Think you can beat me? Try it out!`
+                                        );
+                                        const url = "https://srguesser.vercel.app"; // Optional: add your app's URL
+                                        window.open(
+                                            `https://twitter.com/intent/tweet?text=${tweet}${url ? `%0A${encodeURIComponent(url)}` : ""}`,
+                                            "_blank"
+                                        );
+                                    }}
+                                    className="h-12 border-4 border-black bg-blue-400 px-6 py-3 text-white hover:bg-blue-600 mt-4"
+                                >
+                                    Share on Twitter
+                                </Button>
                             </div>
                         )}
                     </div>
