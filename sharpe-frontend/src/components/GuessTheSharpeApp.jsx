@@ -215,11 +215,38 @@ export default function GuessTheSharpeApp() {
                     <Card className="bg-white border-4 border-gray-900 shadow-lg">
                         <CardContent className="p-4">
                             <ResponsiveContainer width={480} height={340}>
-                                <LineChart data={round.data} margin={{ top: 6, right: 16, left: 0, bottom: 6 }}>
+                                <LineChart data={round.data} margin={{ top: 24, right: 24, left: 12, bottom: 30 }}>
                                     <CartesianGrid stroke="#d4d4d4" strokeDasharray="1 7" />
-                                    <XAxis dataKey="day" hide />
-                                    <YAxis hide domain={["auto", "auto"]} />
-                                    <Line type="monotone" dataKey="pnl" stroke="#000" strokeWidth={1.5} dot={{ r: 1 }} />
+                                    <XAxis
+                                        dataKey="day"
+                                        type="number"
+                                        domain={["dataMin", "dataMax"]}
+                                        label={{
+                                            value: "Day",
+                                            position: "insideBottom",
+                                            offset: -8,
+                                            style: { fontSize: 14, fill: "#555", fontFamily: 'inherit' },
+                                        }}
+                                        tick={{ fontSize: 12, fontFamily: 'inherit' }}
+                                    />
+                                    <YAxis
+                                        label={{
+                                            value: "Cum Returns",
+                                            angle: -90,
+                                            position: "insideLeft",
+                                            offset: 12,
+                                            style: { fontSize: 14, fill: "#555", fontFamily: 'inherit' },
+                                        }}
+                                        tick={{ fontSize: 12, fontFamily: 'inherit' }}
+                                        domain={["auto", "auto"]}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="pnl"
+                                        stroke="#000"
+                                        strokeWidth={1.5}
+                                        dot={{ r: 1 }}
+                                    />
                                 </LineChart>
                             </ResponsiveContainer>
                         </CardContent>
