@@ -1,0 +1,46 @@
+# ──────────────────────────────
+# Node / npm / pnpm / yarn
+# ──────────────────────────────
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ──────────────────────────────
+# Vite build output
+# ──────────────────────────────
+dist/
+.vite/
+
+# ──────────────────────────────
+# Environment & tooling
+# ──────────────────────────────
+.env*
+!.env.example        # keep a template, ignore real creds
+
+# IDE / Editor folders & metadata
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS / Misc
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/tmp
+
+# macOS & Linux symbolic link quarantine
+.AppleDouble
+.LSOverride
+
+# JetBrains Rider / WebStorm
+out/
+
+# Local preview builds
+serve/
